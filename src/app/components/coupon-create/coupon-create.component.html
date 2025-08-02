@@ -1,0 +1,141 @@
+<div class="container mt-4">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-header">
+          <h4 class="mb-0">Create New Coupon</h4>
+        </div>
+        <div class="card-body">
+          <!-- Success Alert -->
+          <div class="alert alert-success alert-dismissible fade show" *ngIf="successMessage" role="alert">
+            {{ successMessage }}
+            <button type="button" class="btn-close" aria-label="Close" (click)="dismissAlert()"></button>
+          </div>
+
+          <!-- Error Alert -->
+          <div class="alert alert-danger alert-dismissible fade show" *ngIf="errorMessage" role="alert">
+            {{ errorMessage }}
+            <button type="button" class="btn-close" aria-label="Close" (click)="dismissAlert()"></button>
+          </div>
+
+          <form (ngSubmit)="onSubmit()" #couponForm="ngForm">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="code" class="form-label">Coupon Code *</label>
+                  <input 
+                    type="text" 
+                    class="form-control" 
+                    id="code" 
+                    name="code"
+                    [(ngModel)]="couponData.code"
+                    required
+                    minlength="1"
+                    maxlength="100"
+                    placeholder="Enter coupon code"
+                    #codeInput="ngModel">
+                  <div class="invalid-feedback d-block" *ngIf="codeInput.invalid && codeInput.touched">
+                    <div *ngIf="codeInput.errors?.['required']">Coupon code is required</div>
+                    <div *ngIf="codeInput.errors?.['minlength']">Coupon code must be at least 1 character</div>
+                    <div *ngIf="codeInput.errors?.['maxlength']">Coupon code must not exceed 100 characters</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="totalUsages" class="form-label">Total Usages *</label>
+                  <input 
+                    type="number" 
+                    class="form-control" 
+                    id="totalUsages" 
+                    name="totalUsages"
+                    [(ngModel)]="couponData.totalUsages"
+                    required
+                    min="1"
+                    placeholder="Enter total usages"
+                    #usagesInput="ngModel">
+                  <div class="invalid-feedback d-block" *ngIf="usagesInput.invalid && usagesInput.touched">
+                    <div *ngIf="usagesInput.errors?.['required']">Total usages is required</div>
+                    <div *ngIf="usagesInput.errors?.['min']">Total usages must be at least 1</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="discountType" class="form-label">Discount Type *</label>
+                  <select 
+                    class="form-select" 
+                    id="discountType" 
+                    name="discountType"
+                    [(ngModel)]="couponData.discountType"
+                    required>
+                    <option *ngFor="let type of discountTypes" [value]="type">
+                      {{ type }}
+                    </option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="discountValue" class="form-label">
+                    Discount Value *
+                    <span class="text-muted">
+                      ({{ couponData.discountType === 'PERCENTAGE' ? '%' : '$' }})
+                    </span>
+                  </label>
+                  <input 
+                    type="number" 
+                    class="form-control" 
+                    id="discountValue" 
+                    name="discountValue"
+                    [(ngModel)]="couponData.discountValue"
+                    required
+                    min="0.01"
+                    step="0.01"
+                    [max]="couponData.discountType === 'PERCENTAGE' ? 100 : null"
+                    placeholder="Enter discount value"
+                    #valueInput="ngModel">
+                  <div class="invalid-feedback d-block" *ngIf="valueInput.invalid && valueInput.touched">
+                    <div *ngIf="valueInput.errors?.['required']">Discount value is required</div>
+                    <div *ngIf="valueInput.errors?.['min']">Discount value must be greater than 0</div>
+                    <div *ngIf="valueInput.errors?.['max']">Percentage cannot exceed 100%</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="expiryDate" class="form-label">Expiry Date *</label>
+              <input 
+                type="datetime-local" 
+                class="form-control" 
+                id="expiryDate" 
+                name="expiryDate"
+                [(ngModel)]="couponData.expiryDate"
+                required
+                #expiryInput="ngModel">
+              <div class="invalid-feedback d-block" *ngIf="expiryInput.invalid && expiryInput.touched">
+                <div *ngIf="expiryInput.errors?.['required']">Expiry date is required</div>
+              </div>
+            </div>
+
+            <div class="d-grid gap-2">
+              <button 
+                type="submit" 
+                class="btn btn-primary" 
+                [disabled]="couponForm.invalid || isLoading">
+                <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                {{ isLoading ? 'Creating...' : 'Create Coupon' }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

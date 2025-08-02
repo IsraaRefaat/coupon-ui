@@ -1,0 +1,159 @@
+<div class="container mt-4">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-header">
+          <h4 class="mb-0">Consume Coupon</h4>
+        </div>
+        <div class="card-body">
+          <!-- Success Alert -->
+          <div class="alert alert-success alert-dismissible fade show" *ngIf="successMessage" role="alert">
+            {{ successMessage }}
+            <button type="button" class="btn-close" aria-label="Close" (click)="dismissAlert()"></button>
+          </div>
+
+          <!-- Error Alert -->
+          <div class="alert alert-danger alert-dismissible fade show" *ngIf="errorMessage" role="alert">
+            {{ errorMessage }}
+            <button type="button" class="btn-close" aria-label="Close" (click)="dismissAlert()"></button>
+          </div>
+
+          <!-- Consumption Result Card -->
+          <div *ngIf="lastConsumption" class="card border-success mb-4">
+            <div class="card-header bg-success text-white">
+              <h5 class="mb-0">Consumption Details</h5>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-6">
+                  <p><strong>Coupon Code:</strong> {{ lastConsumption.couponCode }}</p>
+                  <p><strong>Customer ID:</strong> {{ lastConsumption.customerId }}</p>
+                  <p><strong>Order ID:</strong> {{ lastConsumption.orderId }}</p>
+                </div>
+                <div class="col-md-6">
+                  <p><strong>Discount Applied:</strong> ${{ lastConsumption.discountApplied }}</p>
+                  <p><strong>Consumed At:</strong> {{ formatDateTime(lastConsumption.consumedAt) }}</p>
+                  <p><strong>Consumption ID:</strong> #{{ lastConsumption.id }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <form (ngSubmit)="onSubmit()" #consumeForm="ngForm">
+            <div class="mb-3">
+              <label for="couponCode" class="form-label">Coupon Code *</label>
+              <input 
+                type="text" 
+                class="form-control" 
+                id="couponCode" 
+                name="couponCode"
+                [(ngModel)]="consumeData.couponCode"
+                required
+                minlength="1"
+                maxlength="100"
+                placeholder="Enter coupon code"
+                #codeInput="ngModel">
+              <div class="invalid-feedback d-block" *ngIf="codeInput.invalid && codeInput.touched">
+                <div *ngIf="codeInput.errors?.['required']">Coupon code is required</div>
+                <div *ngIf="codeInput.errors?.['minlength']">Coupon code must be at least 1 character</div>
+                <div *ngIf="codeInput.errors?.['maxlength']">Coupon code must not exceed 100 characters</div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="customerId" class="form-label">Customer ID *</label>
+                  <div class="input-group">
+                    <input 
+                      type="text" 
+                      class="form-control" 
+                      id="customerId" 
+                      name="customerId"
+                      [(ngModel)]="consumeData.customerId"
+                      required
+                      minlength="1"
+                      maxlength="100"
+                      placeholder="Enter customer ID"
+                      #customerInput="ngModel">
+                    <button 
+                      type="button" 
+                      class="btn btn-outline-secondary"
+                      (click)="generateRandomCustomerId()"
+                      title="Generate random customer ID">
+                      <i class="fas fa-random"></i>
+                    </button>
+                  </div>
+                  <div class="invalid-feedback d-block" *ngIf="customerInput.invalid && customerInput.touched">
+                    <div *ngIf="customerInput.errors?.['required']">Customer ID is required</div>
+                    <div *ngIf="customerInput.errors?.['minlength']">Customer ID must be at least 1 character</div>
+                    <div *ngIf="customerInput.errors?.['maxlength']">Customer ID must not exceed 100 characters</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="orderId" class="form-label">Order ID *</label>
+                  <div class="input-group">
+                    <input 
+                      type="text" 
+                      class="form-control" 
+                      id="orderId" 
+                      name="orderId"
+                      [(ngModel)]="consumeData.orderId"
+                      required
+                      minlength="1"
+                      maxlength="100"
+                      placeholder="Enter order ID"
+                      #orderInput="ngModel">
+                    <button 
+                      type="button" 
+                      class="btn btn-outline-secondary"
+                      (click)="generateRandomOrderId()"
+                      title="Generate random order ID">
+                      <i class="fas fa-random"></i>
+                    </button>
+                  </div>
+                  <div class="invalid-feedback d-block" *ngIf="orderInput.invalid && orderInput.touched">
+                    <div *ngIf="orderInput.errors?.['required']">Order ID is required</div>
+                    <div *ngIf="orderInput.errors?.['minlength']">Order ID must be at least 1 character</div>
+                    <div *ngIf="orderInput.errors?.['maxlength']">Order ID must not exceed 100 characters</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="d-grid gap-2">
+              <button 
+                type="submit" 
+                class="btn btn-success" 
+                [disabled]="consumeForm.invalid || isLoading">
+                <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                {{ isLoading ? 'Consuming...' : 'Consume Coupon' }}
+              </button>
+            </div>
+          </form>
+
+          <!-- Help Information -->
+          <div class="mt-4">
+            <div class="card bg-light">
+              <div class="card-body">
+                <h6 class="card-title">
+                  <i class="fas fa-info-circle text-info me-2"></i>
+                  How to Use
+                </h6>
+                <ul class="mb-0 small">
+                  <li>Enter a valid coupon code that hasn't expired</li>
+                  <li>Provide a customer ID to track who used the coupon</li>
+                  <li>Enter an order ID to associate the coupon with a purchase</li>
+                  <li>Use the random generators for testing purposes</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
